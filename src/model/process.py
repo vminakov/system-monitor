@@ -14,9 +14,9 @@ class Process(QtCore.QAbstractTableModel):
         #]
         self._refresh()
 
-        timer = QtCore.QTimer(self)
-        timer.timeout.connect(self._refresh)
-        timer.start(3000)
+        #timer = QtCore.QTimer(self)
+        #timer.timeout.connect(self._refresh)
+        #timer.start(3000)
 
     def _refresh(self):
         print("Refresh called")

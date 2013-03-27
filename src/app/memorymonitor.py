@@ -1,4 +1,5 @@
 from PySide import QtGui, QtCore
+from model.memorychart import MemoryChart
 from app.chart import Chart
 from ui.ui_memorymonitor import Ui_MemoryMonitor
 
@@ -11,8 +12,11 @@ class MemoryMonitor(QtGui.QWidget):
         self.ui.setupUi(self)
 
         chart_widget = Chart(self)
+        chart_widget.setModel(MemoryChart())
+        #chart_widget2 = Chart(self)
         hbox_layout = QtGui.QHBoxLayout()
         hbox_layout.addWidget(chart_widget)
+        #hbox_layout.addWidget(chart_widget2)
         self.setLayout(hbox_layout)
 
     # def paintEvent(self, e):
