@@ -10,14 +10,24 @@ class MemoryMonitor(QtGui.QWidget):
 
         self.ui = Ui_MemoryMonitor()
         self.ui.setupUi(self)
-
-        chart_widget = Chart(self)
-        chart_widget.setModel(MemoryChart())
+        
+        #chart_widget = Chart(self)
+        #chart_widget.setModel(MemoryChart("virt"))
         #chart_widget2 = Chart(self)
-        hbox_layout = QtGui.QHBoxLayout()
-        hbox_layout.addWidget(chart_widget)
+        #chart_widget2.setModel(MemoryChart("swap"))
+        self.ui.virtChart.setModel(MemoryChart("virt"))
+        self.ui.swapChart.setModel(MemoryChart("swap"))
+
+        #self.ui.virtChartPlaceholder = chart_widget
+        #self.ui.swapChartPlaceholder = chart_widget2
+
+
+        
+
+        #hbox_layout = QtGui.QHBoxLayout()
+        #hbox_layout.addWidget(chart_widget)
         #hbox_layout.addWidget(chart_widget2)
-        self.setLayout(hbox_layout)
+        #self.setLayout(hbox_layout)
 
     # def paintEvent(self, e):
 
