@@ -106,7 +106,7 @@ class Chart(QtGui.QWidget):
         y = 0
 
         for index, point_value in enumerate(self.points):
-            print index, point_value
+            #print index, point_value
 
             try:
                 next_index = index + 1

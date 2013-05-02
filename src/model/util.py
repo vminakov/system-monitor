@@ -16,4 +16,4 @@ def humanize_bytes(bytes, precision=1):
     for factor, suffix in abbrevs:
         if bytes >= factor:
             break
-    return '%.*f %s' % (precision, bytes / factor, suffix)
+    return '%.*f %s' % (precision, float(bytes) / factor, suffix)

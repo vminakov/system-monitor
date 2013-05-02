@@ -5,6 +5,7 @@ import __main__
 try:
     if __main__.__IN_QT__ == True:
     # we're inside QApplication
+        
         from PySide.QtCore import QAbstractItemModel as BaseAbstractItemModel
         from PySide.QtCore import QAbstractTableModel as BaseAbstractTableModel
 except (NameError, AttributeError):

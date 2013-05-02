@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'processmonitor.ui'
 #
-# Created: Mon Feb 18 14:36:06 2013
+# Created: Thu May  2 16:58:04 2013
 #      by: pyside-uic 0.2.13 running on PySide 1.1.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -16,8 +16,12 @@ class Ui_ProcessMonitor(object):
         self.verticalLayout = QtGui.QVBoxLayout(ProcessMonitor)
         self.verticalLayout.setObjectName("verticalLayout")
         self.tableView = QtGui.QTableView(ProcessMonitor)
-        self.tableView.setSortingEnabled(True)
+        self.tableView.setAlternatingRowColors(True)
+        self.tableView.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
+        self.tableView.setSelectionBehavior(QtGui.QAbstractItemView.SelectItems)
+        self.tableView.setSortingEnabled(False)
         self.tableView.setObjectName("tableView")
+        self.tableView.horizontalHeader().setStretchLastSection(True)
         self.tableView.verticalHeader().setVisible(False)
         self.verticalLayout.addWidget(self.tableView)
 
