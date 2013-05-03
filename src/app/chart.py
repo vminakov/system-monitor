@@ -36,8 +36,6 @@ class Chart(QtGui.QWidget):
         end_width = self.width();
         end_height = self.height() - 40;
 
-        #brush = QtGui.QBrush(QtCore.Qt.CrossPattern)
-        #qp.setBrush(brush)
         qp.fillRect(start_width, start_height, end_width, end_height, QtGui.QColor("white"))
 
     def drawAxis(self, qp):
@@ -85,25 +83,19 @@ class Chart(QtGui.QWidget):
         qp.drawText(self.width() - 7, self.height() - 10, "0")
 
 
-        #qp.drawPoint(10, 10)
-        #qp.drawPoint(10, 20)
-        #qp.drawPoint(10, 30);
-
     def drawChart(self, qp):
         draw_area_height = self.height() - 40
-
-        #qp.drawLine(50, height, 100, 100)
-
-        # x = 0
-        # x_step = self.width() / 5
-        # y = height / 100 * self.points[0]
-        # print y
 
         x_gap = (self.width() - 40) / len(self.points)
         x = 0
 
         y_gap = draw_area_height / 100
         y = 0
+
+        pen = QtGui.QPen()
+        pen.setColor("darkGreen")
+        pen.setWidth(2)
+        qp.setPen(pen)
 
         for index, point_value in enumerate(self.points):
             #print index, point_value
@@ -120,12 +112,3 @@ class Chart(QtGui.QWidget):
                 qp.drawLine(x, y, next_x, next_y)
             except IndexError:
                 pass
-        #     prev_x = x
-        #     prev_y = y
-
-        #     x = x + x_step
-        #     y = height / 100 * self.points[point_index]
-        #     print y
-
-        #     qp.drawLine(prev_x, prev_y, x, y)
-

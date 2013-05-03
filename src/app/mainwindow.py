@@ -24,8 +24,11 @@
 
 from PySide import QtGui
 from ui.ui_mainwindow import Ui_MainWindow
+from app.systemwindow import SystemWindow
 from app.processmonitor import ProcessMonitor
 from app.memorymonitor import MemoryMonitor
+from app.cpumonitor import CpuMonitor
+from app.networkmonitor import NetworkMonitor
 
 class MainWindow(QtGui.QMainWindow):
 
@@ -37,8 +40,14 @@ class MainWindow(QtGui.QMainWindow):
 		self.ui.setupUi(self)
 
 		# initialize tabs
+		self._systemWindowWidget = SystemWindow()
 		self._processMonitorWidget = ProcessMonitor()
 		self._memoryMonitorWidget = MemoryMonitor()
+		self._cpuMonitorWidget = CpuMonitor()
+		self._networkMonitorWidget = NetworkMonitor()
 
+		self.ui.tabWidget.addTab(self._systemWindowWidget, "System")
 		self.ui.tabWidget.addTab(self._processMonitorWidget, "Processes")
 		self.ui.tabWidget.addTab(self._memoryMonitorWidget, "Memory")
+		self.ui.tabWidget.addTab(self._cpuMonitorWidget, "CPU(s)")
+		self.ui.tabWidget.addTab(self._networkMonitorWidget, "Network")

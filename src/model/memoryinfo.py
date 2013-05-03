@@ -1,5 +1,5 @@
 
-import psutil, random
+import psutil
 
 from PySide import QtCore
 from wsw.model import QAbstractItemModel
@@ -31,7 +31,6 @@ class MemoryInfo(QAbstractItemModel):
             memUsage = psutil.virtual_memory()
         else:
             memUsage = psutil.swap_memory()
-        print memUsage
 
         self.totalChanged.emit(humanize_bytes(memUsage.total, 2))
         if self._type == 'virt':
