@@ -19,7 +19,7 @@ class SystemWindow(QtGui.QWidget):
         distroLabel.setText(self._model.getDistro())
 
         kernelLabel = QtGui.QLabel()
-        kernelLabel.setText(self._model.getKernel())
+        kernelLabel.setText("Kernel: " + self._model.getKernel())
         
         sysInfoVbox = QtGui.QVBoxLayout()
         sysInfoVbox.addWidget(distroLabel)
@@ -56,6 +56,3 @@ class SystemWindow(QtGui.QWidget):
         groupBoxLayout.addStretch(1)
 
         self.ui.infoWidget.setLayout(groupBoxLayout)
-
-
-

@@ -1,7 +1,6 @@
-from PySide import QtGui, QtCore
+from PySide import QtGui
 from model.memorychart import MemoryChart
 from model.memoryinfo import MemoryInfo
-from app.chart import Chart
 from ui.ui_memorymonitor import Ui_MemoryMonitor
 
 class MemoryMonitor(QtGui.QWidget):

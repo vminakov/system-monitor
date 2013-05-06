@@ -1,27 +1,25 @@
 
 import psutil
 
-from PySide import QtCore
-from wsw.model import QAbstractItemModel
+from wsw.model import QAbstractItemModel, QTimer, Signal
 from model.util import humanize_bytes
 
 class MemoryInfo(QAbstractItemModel):
     
-    totalChanged = QtCore.Signal(str)
-    availableChanged = QtCore.Signal(str)
-    percentChanged = QtCore.Signal(str)
-    usedChanged = QtCore.Signal(str)
-    freeChanged = QtCore.Signal(str)
-
     def __init__(self, memType, parent=None):
-        print("MEminfo init")
         super(MemoryInfo, self).__init__(parent)
         self._type = 'virt' if memType == 'virt' else 'swap'
 
+        self.totalChanged = Signal(str)
+        self.availableChanged = Signal(str)
+        self.percentChanged = Signal(str)
+        self.usedChanged = Signal(str)
+        self.freeChanged = Signal(str)
 
-        timer = QtCore.QTimer(self)
-        timer.timeout.connect(self._refresh)
-        timer.start(1000)
+
+        self.timer = QTimer(self)
+        self.timer.timeout.connect(self._refresh)
+        self.timer.start(1000)
 
         self._refresh()
 

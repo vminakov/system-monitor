@@ -104,7 +104,9 @@ class SimpleServerProtocol(WampServerProtocol):
    responds to RPC calls.
    """
 
-   uri = "http://example.com/simple"
+   def __init__(self):
+      super(SimpleServerProtocol, self).__init__()
+      self.uri = "http://example.com/simple"
 
    def onSessionOpen(self):
 

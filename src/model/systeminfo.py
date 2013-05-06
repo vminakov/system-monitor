@@ -30,7 +30,9 @@ class SystemInfo(QAbstractItemModel):
     def getDistro(self):
         distro, version, codename = platform.linux_distribution()
         distro = distro[0].upper() + distro[1:]
-        codename = codename[0].upper() + codename[1:]
+
+        if len(codename) > 0:
+            codename = codename[0].upper() + codename[1:]
 
         return " ".join([distro, version, codename])
         
