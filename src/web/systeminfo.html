@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+   <head>
+
+      <!-- include AutobahnJS .. that's all you need -->
+      <script src="http://autobahn.s3.amazonaws.com/js/autobahn.min.js"></script>
+      <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+      <script src="http://code.highcharts.com/highcharts.js"></script>
+      <script src="bootstrap/js/bootstrap.min.js"></script>
+
+      <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen">
+      <link href="css/system-monitor.css" rel="stylesheet" media="screen">
+
+   </head>
+   <body>
+      <div class="container">
+      
+         <div class="navbar">
+           <div class="navbar-inner">
+             <ul class="nav">
+               <li class="active"><a href="systeminfo.html">System info</a></li>
+               <li><a href='processes.html'>Processes</a></li>
+               <li><a href="memorymonitor.html">Memory monitor</a></li>
+               <li><a href='cpumonitor.html'>CPU monitor</a></li>
+               <li><a href='newtorkmonitor.html'>Network monitor</a></li>
+             </ul>
+           </div>
+         </div>
+         
+         <div class="row">
+            <div class="span3">
+               <img src="img/system-monitor.png" alt="System Monitor" />
+            </div>
+            <div class="span9">
+               <h4>System information:</h4>
+               <div id="sysinfo-container"></div>
+
+               <h4>Hardware information:</h4>
+               <div id="hardware-container"></div>
+            </div>
+         </div>
+            
+      </div>
+
+      <script>
+         jQuery(function() {
+            
+         
+            
+            var sess = null;
+            var endpoint = 'http://example.com/simple/'
+
+            var wsuri;
+            if (window.location.protocol === "file:") {
+               wsuri = "ws://localhost:9000";
+            } else {
+               wsuri = "ws://" + window.location.hostname + ":9000";
+            }
+
+            // connect to WAMP server
+            ab.connect(wsuri,
+
+               // WAMP session was established
+               function (session) {
+
+                  sess = session;
+
+                  console.log("Connected to " + wsuri);
+
+                  // get OS information
+                  sess.call(endpoint + 'sysInfo.getDistro').then(function(distro) {
+                     $('<div />').text(distro).appendTo($('#sysinfo-container'));
+                  });
+                  sess.call(endpoint + 'sysInfo.getKernel').then(function(kernel) {
+                     $('<div />').text(kernel).appendTo($('#sysinfo-container'));
+                  });
+
+                  // get hardware info
+                  sess.call(endpoint + 'sysInfo.getTotalMemory').then(function(memory) {
+                     $('<div />').text("Memory: " + memory).appendTo($('#hardware-container'));
+                  });
+                  sess.call(endpoint + 'sysInfo.getCpu').then(function(cpus) {
+                     for (var i = 0; i < cpus.length; i++) {
+                        $('<div />').text('Processor #' + i + ': ' + cpus[i]).appendTo('#hardware-container');
+                     }
+                     
+                  });
+
+               },
+
+               // WAMP session is gone
+               function (code, reason) {
+
+                  sess = null;
+
+                  if (code == ab.CONNECTION_UNSUPPORTED) {
+                     window.location = "http://autobahn.ws/unsupportedbrowser";
+                  } else {
+                     alert(reason);
+                  }
+               }
+            );
+         });
+
+      </script>
+   </body>
+ </html>
