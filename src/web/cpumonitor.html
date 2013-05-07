@@ -59,6 +59,7 @@
                   console.log("Connected to " + wsuri);
 
                   sess.call(endpoint + 'cpu#getCpuNum').then(function(cpuNum) {
+                     
                      // build HTML for CPU charts
                      for (var i = 0; i < cpuNum; i++) {
                         var cpuChartId = 'cpu' + i;
@@ -105,24 +106,25 @@
                            }]
                         });
 
-                        /*sess.subscribe(endpoint + modelName + '.dataChanged',function() {
-                           eval("var j = '" + modelName + "'");
-                           console.log(j);
-                           //console.log("got response from " + modelName);
-                           sess.call(endpoint + modelName + '.data').then(function(points) {
-                              newPoint = points.pop();
-                              cpuChart.series[0].addPoint(newPoint, true, true);
+                        // use closure to assign signal handlers and copy required parameters.
+                        // otherwise, only values assigned in the last for-loop iteration would
+                        // be available to subscribe callbacks (because of lexical scope of JS)
+                        (function(sess, endpoint, modelName, cpuChart) {
+                           var modName = modelName;
+                           var chart = cpuChart;
+
+                           sess.subscribe(endpoint + modName + '.dataChanged', function() {
+                              sess.call(endpoint + modName + '.data').then(function(points) {
+                                 newPoint = points.pop();
+                                 console.log(chart.title.text);
+                                 chart.series[0].addPoint(newPoint, true, true);
+                              });
                            });
-                        });*/
-                        stuff(sess, endpoint, modelName, cpuChart);
+
+                        })(sess, endpoint, modelName, cpuChart);
 
                      } // end 'num of cpu' for loop
 
-                     // for (var i = 0; i < 2; i++) {
-                     //    var j = i;
-                     //    console.log("integer - " + j);
-                     //    eval("setInterval(function() { console.log(" + j + "); }, 1000);");
-                     // }
                   });
                },
 
@@ -140,15 +142,6 @@
             );
          });
 
-         function stuff(sess, endpoint, modelName, cpuChart) {
-            sess.subscribe(endpoint + modelName + '.dataChanged',function() {
-               console.log(modelName);
-               sess.call(endpoint + modelName + '.data').then(function(points) {
-                  newPoint = points.pop();
-                  cpuChart.series[0].addPoint(newPoint, true, true);
-               });
-            });
-         }
       </script>
    </body>
  </html>

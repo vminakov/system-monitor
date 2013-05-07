@@ -23,10 +23,13 @@ class CpuChart(QAbstractItemModel):
     def _refresh(self):
         cpuUsage = psutil.cpu_percent(interval=None, percpu=True)[self._cpuNum]        
 
+        if self._cpuNum == 1:
+            print cpuUsage
         self._data.pop(0)
         self._data.append(cpuUsage)
 
         self.dataChanged.emit(0, 0)
 
     def data(self, index=None, role=QtCore.Qt.DisplayRole):
+        #print("Cpu num: %s: %s" % (self._cpuNum, self._data))
         return self._data

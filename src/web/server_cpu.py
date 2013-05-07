@@ -57,7 +57,7 @@ class MemoryMonitorServerProtocol(WampServerProtocol):
          modelName = "cpuModel%s" % i
          cpuModel = CpuChart(i)
          cpuModel.signalNamespace(modelName)
-         self.registerMethodForRpc(self.uri + '/' + modelName + '.data', cpuModel, lambda i: cpuModel.data())
+         self.registerMethodForRpc(self.uri + '/' + modelName + '.data', cpuModel, cpuModel.data)
          self.cpuModels.append(cpuModel)
 
       self.registerForRpc(self, self.uri + '/cpu#')
