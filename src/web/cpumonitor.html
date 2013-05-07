@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+   <head>
+
+      <!-- include AutobahnJS .. that's all you need -->
+      <script src="http://autobahn.s3.amazonaws.com/js/autobahn.min.js"></script>
+      <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+      <script src="http://code.highcharts.com/highcharts.js"></script>
+      <script src="bootstrap/js/bootstrap.min.js"></script>
+
+      <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen">
+      <link href="css/system-monitor.css" rel="stylesheet" media="screen">
+
+   </head>
+   <body>
+      <div class="container">
+      
+         <div class="navbar">
+           <div class="navbar-inner">
+             <ul class="nav">
+               <li><a href="systeminfo.html">System info</a></li>
+               <li><a href='processes.html'>Processes</a></li>
+               <li><a href="memorymonitor.html">Memory monitor</a></li>
+               <li class="active"><a href='cpumonitor.html'>CPU monitor</a></li>
+               <li><a href='newtorkmonitor.html'>Network monitor</a></li>
+             </ul>
+           </div>
+         </div>
+         
+         <div id="cpucharts">
+
+         </div>
+            
+      </div>
+
+      <script>
+         jQuery(function() {
+            
+         
+            
+            var sess = null;
+            var endpoint = 'http://example.com/simple/'
+
+            var wsuri;
+            if (window.location.protocol === "file:") {
+               wsuri = "ws://localhost:9000";
+            } else {
+               wsuri = "ws://" + window.location.hostname + ":9000";
+            }
+
+            // connect to WAMP server
+            ab.connect(wsuri,
+
+               // WAMP session was established
+               function (session) {
+
+                  sess = session;
+
+                  console.log("Connected to " + wsuri);
+
+                  sess.call(endpoint + 'cpu#getCpuNum').then(function(cpuNum) {
+                     // build HTML for CPU charts
+                     for (var i = 0; i < cpuNum; i++) {
+                        var cpuChartId = 'cpu' + i;
+                        var chartEl = $('<div />').attr('id', cpuChartId).css('width', '100%').css('height', '400px');
+                        var spanEl = $('<div />').attr('class', 'span6').append(chartEl);
+
+                        if (i % 2 == 0) {
+                           $('#cpucharts').append($('<div />').addClass('row').append(spanEl));
+                        } else {
+                           $('#cpucharts').find('div.row').last().append(spanEl);
+                        }
+                     }
+
+                     // thereafter, create CPU chart and register signal callbacks
+                     for (var i = 0; i < 2; i++) {
+                        var cpuChartId = 'cpu' + i; 
+                        var chartTitle = 'CPU #' + i;
+                        var modelName = 'cpuModel' + i;
+
+                        var cpuChart = new Highcharts.Chart({
+                           chart: {
+                              renderTo: cpuChartId,
+                              type: 'spline',
+                              animation: Highcharts.svg,
+                           },
+                           marginRight: 10,
+                           title: {
+                              text: chartTitle
+                           },
+                           xAxis: {
+                              type: 'datetime',
+                              tickPixelInterval: 150
+                           },
+                           yAxis: {
+                              min: 0,
+                              max: 100,
+                              title: {
+                                 text: 'CPU usage (%)'
+                              }
+                           },
+                           series: [{
+                              /*name: 'Random data',*/
+                              data: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+                           }]
+                        });
+
+                        /*sess.subscribe(endpoint + modelName + '.dataChanged',function() {
+                           eval("var j = '" + modelName + "'");
+                           console.log(j);
+                           //console.log("got response from " + modelName);
+                           sess.call(endpoint + modelName + '.data').then(function(points) {
+                              newPoint = points.pop();
+                              cpuChart.series[0].addPoint(newPoint, true, true);
+                           });
+                        });*/
+                        stuff(sess, endpoint, modelName, cpuChart);
+
+                     } // end 'num of cpu' for loop
+
+                     // for (var i = 0; i < 2; i++) {
+                     //    var j = i;
+                     //    console.log("integer - " + j);
+                     //    eval("setInterval(function() { console.log(" + j + "); }, 1000);");
+                     // }
+                  });
+               },
+
+               // WAMP session is gone
+               function (code, reason) {
+
+                  sess = null;
+
+                  if (code == ab.CONNECTION_UNSUPPORTED) {
+                     window.location = "http://autobahn.ws/unsupportedbrowser";
+                  } else {
+                     alert(reason);
+                  }
+               }
+            );
+         });
+
+         function stuff(sess, endpoint, modelName, cpuChart) {
+            sess.subscribe(endpoint + modelName + '.dataChanged',function() {
+               console.log(modelName);
+               sess.call(endpoint + modelName + '.data').then(function(points) {
+                  newPoint = points.pop();
+                  cpuChart.series[0].addPoint(newPoint, true, true);
+               });
+            });
+         }
+      </script>
+   </body>
+ </html>

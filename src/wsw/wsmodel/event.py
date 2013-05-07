@@ -5,10 +5,20 @@ class Signal(object):
 
     wampProtocol = None
 
-    def __init__(self, acceptedType, signalName=None, uri=None):
-        if Signal.wampProtocol is None:
-            raise RuntimeError("Cannot create a WebSocket Signal - no WampProtocol is registered")
+    def __init__(self, *valueTypes, **kwargs):
+        """Creates new signal
 
+        Nothing can be done really in signal constructor.
+        WampProtocol is assigned during runtime, when model classes
+        are instantiated. However, signals must be instantiated
+        during class declaration, when wampProtocol is unknown.
+
+        """
+        self._isIntialized = False
+        signalName = kwargs.pop('signalName', None)
+
+        # if signal name is not passed, set it as name of the variable current signal instance
+        # was assigned to.
         if signalName is None:
             (filename,line_number,function_name,text) = traceback.extract_stack()[-2]
             self.signalName = text[:text.find('=')].strip()
@@ -17,30 +27,44 @@ class Signal(object):
                 self.signalName = self.signalName[self.signalName.rindex('.') + 1:]
             except:
                 pass
-
         else:
             self.signalName = signalName
 
+    def init(self, instanceName, uri=None):
+        """Initialize signal.
+
+        instanceName muts be passed. Other configuration properties can be
+        set from wampProtocol instance
+
+        """
+        if Signal.wampProtocol is None:
+            raise RuntimeError("Cannot create a WebSocket Signal - no WampProtocol is registered")
+
+        # by default, base signal URI is obtained from WampProtocol instances
         if uri is None:
             self.uri = Signal.wampProtocol.uri
         else:
             self.uri = uri
 
-    def setInstanceName(self, instanceName):
+        # assigne instance name
         self.instanceName = instanceName
         self.uri = self.uri + '/' + self.instanceName + '.' + self.signalName
         self.wampProtocol.registerForPubSub(self.uri)
 
+        self._isIntialized = True
 
-    def emit(self, data1, data2):
-        Signal.wampProtocol.dispatch(self.uri, data1)
+
+    def emit(self, *data):
+        if self._isIntialized:
+            print(self.uri)
+            Signal.wampProtocol.dispatch(self.uri, data)
 
 
 class Slot(object):
 
     wampProtocol = None
 
-    def _init_(self, name, uri=None):
+    def __init__(self, name, uri=None):
         if Slot.wampProtocol is None:
             raise RuntimeError("Cannot create a WebSocket Signal - no WampProtocol is registered")
         self.name = name

@@ -84,7 +84,7 @@ class Chart(QtGui.QWidget):
 
 
     def drawChart(self, qp):
-        draw_area_height = self.height() - 40
+        draw_area_height = self.height() - 30
 
         x_gap = (self.width() - 40) / len(self.points)
         x = 0
@@ -96,6 +96,8 @@ class Chart(QtGui.QWidget):
         pen.setColor("darkGreen")
         pen.setWidth(2)
         qp.setPen(pen)
+
+        #qp.drawLine(40, draw_area_height + 10, self.width() - 40, draw_area_height + 10)
 
         for index, point_value in enumerate(self.points):
             #print index, point_value

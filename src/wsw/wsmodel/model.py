@@ -28,5 +28,5 @@ class AbstractItemModel(object):
     def signalNamespace(self, name):
     	for attribute in dir(self):
     		if type(getattr(self, attribute)) == Signal:
-    			getattr(self, attribute).setInstanceName(name)
+    			getattr(self, attribute).init(name)
 

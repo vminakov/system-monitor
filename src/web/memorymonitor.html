@@ -21,8 +21,8 @@
                <li><a href="systeminfo.html">System info</a></li>
                <li><a href='processes.html'>Processes</a></li>
                <li class="active"><a href="#">Memory monitor</a></li>
-               <li><a href='#cpumonitor.html'>CPU monitor</a></li>
-               <li><a href='#newtorkmonitor.html'>Network monitor</a></li>
+               <li><a href='cpumonitor.html'>CPU monitor</a></li>
+               <li><a href='newtorkmonitor.html'>Network monitor</a></li>
              </ul>
            </div>
          </div>
@@ -30,9 +30,49 @@
          <div class="row">
             <div class="span6">
                <div id="virt-memory-chart" style="width:100%; height:400px;"></div>
+               <table class="meminfo">
+                  <tr>
+                     <td>Total:</td>
+                     <td id="meminfo-virt-total"></td>
+                  </tr>
+                  <tr>
+                     <td>Available:</td>
+                     <td id="meminfo-virt-available"></td>
+                  </tr>
+                  <tr>
+                     <td>Percent:</td>
+                     <td id="meminfo-virt-percent"></td>
+                  </tr>
+                  <tr>
+                     <td>Used:</td>
+                     <td id="meminfo-virt-used"></td>
+                  </tr>
+                  <tr>
+                     <td>Free:</td>
+                     <td id="meminfo-virt-free"></td>
+                  </tr>
+               </table>
             </div>
             <div class="span6">
                <div id="swap-memory-chart" style="width:100%; height:400px;"></div>
+               <table class="meminfo">
+                  <tr>
+                     <td>Total:</td>
+                     <td id="meminfo-swap-total"></td>
+                  </tr>
+                  <tr>
+                     <td>Percent:</td>
+                     <td id="meminfo-swap-percent"></td>
+                  </tr>
+                  <tr>
+                     <td>Used:</td>
+                     <td id="meminfo-swap-used"></td>
+                  </tr>
+                  <tr>
+                     <td>Free:</td>
+                     <td id="meminfo-swap-free"></td>
+                  </tr>
+               </table>
             </div>
          </div>
       </div>
@@ -115,24 +155,67 @@
                   sess.subscribe(endpoint + "memoryChartVirt.dataChanged", function() {
                      sess.call(endpoint + 'memoryChartVirt.data').then(function(points) {
                         newPoint = points.pop();
-                        virtChart.series[0].addPoint(newPoint);
+                        virtChart.series[0].addPoint(newPoint, true, true);
                      });   
                   });
 
                   sess.subscribe(endpoint + "memoryChartSwap.dataChanged", function() {
                      sess.call(endpoint + 'memoryChartSwap.data').then(function(points) {
                         newPoint = points.pop();
-                        swapChart.series[0].addPoint(newPoint);
+                        swapChart.series[0].addPoint(newPoint, true, true);
                      });   
                   });
 
-
-
-                  sess.subscribe(endpoint + "memoryInfoVirt.totalChanged", function(totalBytes) {
-                     console.log(totalBytes);
+                  // pre-populate memory usage stats for virtual memory and swap
+                  sess.call(endpoint + "memoryInfoVirt.getCounters").then(function(counters) {
+                     $('#meminfo-virt-total').text(counters.total);
+                     $('#meminfo-virt-available').text(counters.available);
+                     $('#meminfo-virt-percent').text(counters.percent);
+                     $('#meminfo-virt-used').text(counters.used);
+                     $('#meminfo-virt-free').text(counters.free);
                   });
+                  sess.call(endpoint + "memoryInfoSwap.getCounters").then(function(counters) {
+                     $('#meminfo-swap-total').text(counters.total);
+                     $('#meminfo-swap-percent').text(counters.percent);
+                     $('#meminfo-swap-used').text(counters.used);
+                     $('#meminfo-swap-free').text(counters.free);
+                  });
+
+
+                  // when memory usage changes (i.e. corresponding signal is received),
+                  // set new memory info in info table
+
+                  // do it for virtual memory...
+                  sess.subscribe(endpoint + "memoryInfoVirt.totalChanged", function(eventUri, bytes) {
+                     $('#meminfo-virt-total').text(bytes);
+                  });
+                  sess.subscribe(endpoint + "memoryInfoVirt.availableChanged", function(eventUri, bytes) {
+                     $('#meminfo-virt-available').text(bytes);
+                  });
+                  sess.subscribe(endpoint + "memoryInfoVirt.percentChanged", function(eventUri, percent) {
+                     $('#meminfo-virt-percent').text(percent);
+                  });
+                  sess.subscribe(endpoint + "memoryInfoVirt.usedChanged", function(eventUri, bytes) {
+                     $('#meminfo-virt-used').text(bytes);
+                  });
+                  sess.subscribe(endpoint + "memoryInfoVirt.freeChanged", function(eventUri, bytes) {
+                     $('#meminfo-virt-free').text(bytes);
+                  });
+
+                  // ... and swap memory
+                  sess.subscribe(endpoint + "memoryInfoSwap.totalChanged", function(eventUri, bytes) {
+                     $('#meminfo-swap-total').text(bytes);
+                  });
+                  sess.subscribe(endpoint + "memoryInfoSwap.percentChanged", function(eventUri, percent) {
+                     $('#meminfo-swap-percent').text(percent);
+                  });
+                  sess.subscribe(endpoint + "memoryInfoSwap.usedChanged", function(eventUri, bytes) {
+                     $('#meminfo-swap-used').text(bytes);
+                  });
+                  sess.subscribe(endpoint + "memoryInfoSwap.freeChanged", function(eventUri, bytes) {
+                     $('#meminfo-swap-free').text(bytes);
+                  });                  
                   
-                  //test();
                },
 
                // WAMP session is gone

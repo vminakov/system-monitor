@@ -13,16 +13,13 @@ class CpuMonitor(QtGui.QWidget):
         gridLayout = QtGui.QGridLayout()
 
         numOfCpus = len(psutil.cpu_percent(interval=None, percpu=True))
-        print numOfCpus
         for i in range(numOfCpus):
-            print("in range")
             cpuChartModel = CpuChart(i)
             cpuChartWidget = CpuMonitorWidget(i, cpuChartModel)
             
             row = i / 2
             col = 0 if i % 2 == 0 else 1
             gridLayout.addWidget(cpuChartWidget, row, col)
-            print("Added grid column: %s and %s" % (row, col))
 
         self.setLayout(gridLayout)
         self.show()

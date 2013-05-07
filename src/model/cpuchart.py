@@ -2,7 +2,7 @@
 import psutil, random
 
 from PySide import QtCore
-from wsw.model import QAbstractItemModel
+from wsw.model import QAbstractItemModel, QTimer
 
 class CpuChart(QAbstractItemModel):
     def __init__(self, cpuNum, parent=None):
@@ -14,9 +14,9 @@ class CpuChart(QAbstractItemModel):
 
         self._data = [cpuUsage] * 10
 
-        timer = QtCore.QTimer(self)
-        timer.timeout.connect(self._refresh)
-        timer.start(1000)
+        self.timer = QTimer(self)
+        self.timer.timeout.connect(self._refresh)
+        self.timer.start(1000)
 
         self._refresh()
 
@@ -28,5 +28,5 @@ class CpuChart(QAbstractItemModel):
 
         self.dataChanged.emit(0, 0)
 
-    def data(self, index, role=QtCore.Qt.DisplayRole):
+    def data(self, index=None, role=QtCore.Qt.DisplayRole):
         return self._data
