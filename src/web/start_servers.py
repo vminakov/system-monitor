@@ -1,3 +1,10 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+#
+#       start_servers.py
+#       
+#		A primitive script to start WebSocket servers
+
 import subprocess
 
 subprocess.Popen(['python', 'server_info.py'])

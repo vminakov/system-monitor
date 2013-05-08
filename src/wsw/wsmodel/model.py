@@ -26,6 +26,7 @@ class TimeoutSignal(object):
 class AbstractItemModel(object):
     def __init__(self, parent=None):
         self.dataChanged = Signal()
+
         for attributeName, attribute in self.__class__.__dict__.iteritems():
             if type(attribute) == Signal:
                 setattr(self, attributeName, copy.deepcopy(attribute))
@@ -35,3 +36,8 @@ class AbstractItemModel(object):
     		if type(getattr(self, attribute)) == Signal:
     			getattr(self, attribute).init(name)
 
+class AbstractTableModel(AbstractItemModel):
+	
+	def index(self, x, y):
+		# create anonymous class
+		return type("ModelIndex", tuple([object]), {'column': lambda self: x, 'row': lambda self: y})

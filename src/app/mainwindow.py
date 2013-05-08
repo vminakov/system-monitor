@@ -22,7 +22,7 @@
 
 #import os, base64, subprocess, json, time
 
-from PySide import QtGui
+from PySide import QtGui, QtCore
 from ui.ui_mainwindow import Ui_MainWindow
 from app.systemwindow import SystemWindow
 from app.processmonitor import ProcessMonitor
@@ -39,6 +39,11 @@ class MainWindow(QtGui.QMainWindow):
 		self.ui = Ui_MainWindow()
 		self.ui.setupUi(self)
 
+		# setup menu actions
+		self.ui.actionExit.triggered.connect(QtCore.QCoreApplication.instance().quit)
+		self.ui.actionAbout.triggered.connect(self.about)
+		self.ui.actionAboutQt.triggered.connect(self.aboutQt)
+
 		# initialize tabs
 		self._systemWindowWidget = SystemWindow()
 		self._processMonitorWidget = ProcessMonitor()
@@ -51,3 +56,10 @@ class MainWindow(QtGui.QMainWindow):
 		self.ui.tabWidget.addTab(self._memoryMonitorWidget, "Memory")
 		self.ui.tabWidget.addTab(self._cpuMonitorWidget, "CPU(s)")
 		self.ui.tabWidget.addTab(self._networkMonitorWidget, "Network")
+
+	def about(self):
+		QtGui.QMessageBox.about(self, "About System Monitor", 
+			"A sample Qt/PySide application, which uses self-updating models")
+
+	def aboutQt(self):
+		QtGui.QMessageBox.aboutQt(self)

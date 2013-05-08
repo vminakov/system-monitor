@@ -2,22 +2,21 @@
 import psutil
 
 from PySide import QtCore
+from wsw.model import QAbstractTableModel
 from model.util import humanize_bytes
 
-class Process(QtCore.QAbstractTableModel):
+class Process(QAbstractTableModel):
     def __init__(self, parent=None):
         super(Process, self).__init__(parent)
 
         self._refresh()
 
-        timer = QtCore.QTimer(self)
-        timer.timeout.connect(self._refresh)
-        timer.start(3000)
+        self.timer = QtCore.QTimer(self)
+        self.timer.timeout.connect(self._refresh)
+        self.timer.start(3000)
 
     def _refresh(self):
-        print("Refresh called")
         self._data = []
-        
 
         for p in psutil.process_iter():
             mem = p.get_memory_info()
@@ -34,7 +33,8 @@ class Process(QtCore.QAbstractTableModel):
             ])
 
         self._data = sorted(self._data, key=lambda p: float(p[-1][:-1]), reverse=True)
-        self.reset()
+        #self.reset()
+        self.dataChanged.emit(self.index(0, 0), self.index(self.rowCount() - 1, self.columnCount() - 1))
 
     def rowCount(self, parent=QtCore.QModelIndex()):
         return len(self._data)
@@ -71,3 +71,6 @@ class Process(QtCore.QAbstractTableModel):
             return 'Memory usage'
         elif section == 7:
             return 'CPU usage'
+
+    def allData(self):
+        return self._data

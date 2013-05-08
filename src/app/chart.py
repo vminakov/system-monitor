@@ -89,7 +89,7 @@ class Chart(QtGui.QWidget):
         x_gap = (self.width() - 40) / len(self.points)
         x = 0
 
-        y_gap = draw_area_height / 100
+        y_gap = float(draw_area_height - 10) / 100
         y = 0
 
         pen = QtGui.QPen()
@@ -97,7 +97,6 @@ class Chart(QtGui.QWidget):
         pen.setWidth(2)
         qp.setPen(pen)
 
-        #qp.drawLine(40, draw_area_height + 10, self.width() - 40, draw_area_height + 10)
 
         for index, point_value in enumerate(self.points):
             #print index, point_value

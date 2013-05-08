@@ -1,4 +1,3 @@
-from PySide.QtGui import QApplication
 
 import __main__
 
@@ -14,12 +13,16 @@ try:
 except (NameError, AttributeError):
     print ("importing from WSW")
     from wsw.wsmodel.model import AbstractItemModel as BaseAbstractItemModel
+    from wsw.wsmodel.model import AbstractTableModel as BaseAbstractTableModel
     from wsw.wsmodel.model import Timer as BaseTimer
     from wsw.wsmodel.event import Signal as BaseSignal
     from wsw.wsmodel.event import Slot as BaseSlot
     #from wsw.wsmodel.model import AbstractTableModel as BaseAbstractTableModel
 
 class QAbstractItemModel(BaseAbstractItemModel):
+    pass
+
+class QAbstractTableModel(BaseAbstractTableModel):
     pass
 
 class QTimer(BaseTimer):
