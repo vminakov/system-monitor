@@ -95,13 +95,13 @@ if __name__ == '__main__':
    else:
       debug = False
 
-   factory = WampServerFactory("ws://localhost:9000", debugWamp = debug)
+   factory = WampServerFactory("ws://localhost:9002", debugWamp = debug)
    factory.protocol = MemoryMonitorServerProtocol
    factory.setProtocolOptions(allowHixie76 = True)
    listenWS(factory)
 
    webdir = File(".")
    web = Site(webdir)
-   reactor.listenTCP(8080, web)
+   reactor.listenTCP(8082, web)
 
    reactor.run()

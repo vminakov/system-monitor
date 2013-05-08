@@ -31,10 +31,10 @@ from autobahn.wamp import exportRpc, \
                           WampServerProtocol
 
 from wsw.wsmodel.event import Signal, Slot
-from model.cpuchart import CpuChart
+from model.networkinfo import NetworkInfo
 
 
-class MemoryMonitorServerProtocol(WampServerProtocol):
+class NetworkInfoServerProtocol(WampServerProtocol):
    """
    Demonstrates creating a simple server with Autobahn WebSockets that
    responds to RPC calls.
@@ -50,31 +50,36 @@ class MemoryMonitorServerProtocol(WampServerProtocol):
       # when connection is established, we create our
       # model instances and register them for RPC. that's it.
 
-      # create and setup cpu models
-      self.cpuModels = []
-      numOfCpus = len(psutil.cpu_percent(interval=None, percpu=True))
-      for i in range(numOfCpus):
-         modelName = "cpuModel%s" % i
-         cpuModel = CpuChart(i)
-         cpuModel.signalNamespace(modelName)
-         self.registerMethodForRpc(self.uri + '/' + modelName + '.data', cpuModel, cpuModel.data)
-         self.cpuModels.append(cpuModel)
+      # create and setup network info model
+      self.netInfoModels = []
 
-      self.registerForRpc(self, self.uri + '/cpu#')
+      ifaces = self.getIfaces()
+      for iface in ifaces:
+         netInfoModel = NetworkInfo(iface, 2)
+         modelName = 'netInfoModel' + iface
+         netInfoModel.signalNamespace(modelName)
+         self.netInfoModels.append(netInfoModel)
+         #self.registerMethodForRpc(self.uri + '/' + modeName + '.')
+
+      self.registerForRpc(self, self.uri + '/network#')
 
 
    def connectionLost(self, reason):
       WampServerProtocol.connectionLost(self, reason)
 
-      for model in self.cpuModels:
+      for model in self.netInfoModels:
          model.timer.stop()
 
-      self.cpuModels = []
+      self.netInfoModels = []
 
    @exportRpc
-   def getCpuNum(self):
-      return len(psutil.cpu_percent(interval=None, percpu=True))
+   def getIfaces(self):
+      ifaces = psutil.network_io_counters(pernic=True).keys()
+      ifaces.append('total')
 
+      return ifaces
+
+      #return ['eth1', 'total']
 
 
 if __name__ == '__main__':
@@ -85,13 +90,13 @@ if __name__ == '__main__':
    else:
       debug = False
 
-   factory = WampServerFactory("ws://localhost:9003", debugWamp = debug)
-   factory.protocol = MemoryMonitorServerProtocol
+   factory = WampServerFactory("ws://localhost:9004", debugWamp = debug)
+   factory.protocol = NetworkInfoServerProtocol
    factory.setProtocolOptions(allowHixie76 = True)
    listenWS(factory)
 
    webdir = File(".")
    web = Site(webdir)
-   reactor.listenTCP(8083, web)
+   reactor.listenTCP(8084, web)
 
    reactor.run()

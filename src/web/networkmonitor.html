@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+   <head>
+
+      <!-- include AutobahnJS .. that's all you need -->
+      <script src="http://autobahn.s3.amazonaws.com/js/autobahn.min.js"></script>
+      <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+      <script src="http://code.highcharts.com/highcharts.js"></script>
+      <script src="bootstrap/js/bootstrap.min.js"></script>
+
+      <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen">
+      <link href="css/system-monitor.css" rel="stylesheet" media="screen">
+
+   </head>
+   <body>
+      <div class="container">
+      
+         <div class="navbar">
+           <div class="navbar-inner">
+             <ul class="nav">
+               <li><a href="systeminfo.html">System info</a></li>
+               <li><a href='processes.html'>Processes</a></li>
+               <li><a href="memorymonitor.html">Memory monitor</a></li>
+               <li><a href='cpumonitor.html'>CPU monitor</a></li>
+               <li class="active"><a href='networkmonitor.html'>Network monitor</a></li>
+             </ul>
+           </div>
+         </div>
+         
+         <div class="row">
+         </div>
+      </div>
+
+      <script>
+         jQuery(function() {
+
+            var sess = null;
+            var endpoint = 'http://example.com/simple/'
+
+            var wsuri;
+            if (window.location.protocol === "file:") {
+               wsuri = "ws://localhost:9004";
+            } else {
+               wsuri = "ws://" + window.location.hostname + ":9004";
+            }
+
+            // connect to WAMP server
+            ab.connect(wsuri,
+
+               // WAMP session was established
+               function (session) {
+
+                  sess = session;
+
+                  console.log("Connected to " + wsuri);
+
+                  sess.call(endpoint + 'network#getIfaces').then(function(ifaces) {
+
+                     for (var i = 0; i < ifaces.length; i++) {
+                        var ifaceName = ifaces[i];
+                        var modelName = 'netInfoModel' + ifaces[i];
+
+                        // create an html table for current interface
+                        var row = $('<div />').addClass('span9').append($('<h4 />').text(ifaceName));
+
+                        var table = $('<table />').addClass('netinfo');
+                        
+                        $('<tr />')
+                           .append($('<td />').text('Bytes sent'))
+                           .append($('<td />').attr('id', ifaceName + '-bytes-sent').addClass('data'))
+                           .append($('<td />').attr('id', ifaceName + '-bytes-sent-speed').addClass('data'))
+                           .appendTo(table);
+
+                        $('<tr />')
+                           .append($('<td />').text('Bytes reveived'))
+                           .append($('<td />').attr('id', ifaceName + '-bytes-received').addClass('data'))
+                           .append($('<td />').attr('id', ifaceName + '-bytes-received-speed').addClass('data'))
+                           .appendTo(table);
+
+                        $('<tr />')
+                           .append($('<td />').text('Packes sent'))
+                           .append($('<td />').attr('id', ifaceName + '-packets-sent').addClass('data'))
+                           .append($('<td />').attr('id', ifaceName + '-packets-sent-speed').addClass('data'))
+                           .appendTo(table);
+
+                        $('<tr />')
+                           .append($('<td />').text('Packets received'))
+                           .append($('<td />').attr('id', ifaceName + '-packets-received').addClass('data'))
+                           .append($('<td />').attr('id', ifaceName + '-packets-received-speed').addClass('data'))
+                           .appendTo(table);
+
+                        row.append(table).appendTo('div.row');
+
+                        // connect network info signals
+                        (function(sess, modelName, ifaceName) {
+
+                           // connect bytes signals
+                           sess.subscribe(endpoint + modelName + '.bytesSentChanged', function(uri, sentBytes) {
+                              $('#' + ifaceName + '-bytes-sent').text(sentBytes);
+                           });
+                           sess.subscribe(endpoint + modelName + '.bytesReceivedChanged', function(uri, receivedBytes) {
+                              $('#' + ifaceName + '-bytes-received').text(receivedBytes);
+                           });
+                           sess.subscribe(endpoint + modelName + '.bytesSentSpeedChanged', function(uri, sentSpeed) {
+                              $('#' + ifaceName + '-bytes-sent-speed').text(sentSpeed);
+                           });
+                           sess.subscribe(endpoint + modelName + '.bytesReceivedSpeedChanged', function(uri, receivedSpeed) {
+                              $('#' + ifaceName + '-bytes-received-speed').text(receivedSpeed);
+                           });
+
+                           // connect packets signals
+                           sess.subscribe(endpoint + modelName + '.packetsSentChanged', function(uri, sentPackets) {
+                              $('#' + ifaceName + '-packets-sent').text(sentPackets);
+                           });
+                           sess.subscribe(endpoint + modelName + '.packetsReceivedChanged', function(uri, receivedPackets) {
+                              $('#' + ifaceName + '-packets-received').text(receivedPackets);
+                           });
+                           sess.subscribe(endpoint + modelName + '.packetsSentSpeedChanged', function(uri, sentSpeed) {
+                              $('#' + ifaceName + '-packets-sent-speed').text(sentSpeed);
+                           });
+                           sess.subscribe(endpoint + modelName + '.packetsReceivedSpeedChanged', function(uri, receivedSpeed) {
+                              $('#' + ifaceName + '-packets-received-speed').text(receivedSpeed);
+                           });
+
+                        })(sess, modelName, ifaceName);
+                     }
+
+                  });              
+                  
+               },
+
+               // WAMP session is gone
+               function (code, reason) {
+
+                  sess = null;
+
+                  if (code == ab.CONNECTION_UNSUPPORTED) {
+                     window.location = "http://autobahn.ws/unsupportedbrowser";
+                  } else {
+                     alert(reason);
+                  }
+               }
+            );
+         });
+      </script>
+   </body>
+ </html>

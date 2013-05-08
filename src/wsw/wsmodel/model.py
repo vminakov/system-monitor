@@ -1,4 +1,6 @@
 
+import copy
+
 from twisted.internet import task
 from wsw.wsmodel.event import Signal
 
@@ -24,6 +26,9 @@ class TimeoutSignal(object):
 class AbstractItemModel(object):
     def __init__(self, parent=None):
         self.dataChanged = Signal()
+        for attributeName, attribute in self.__class__.__dict__.iteritems():
+            if type(attribute) == Signal:
+                setattr(self, attributeName, copy.deepcopy(attribute))
 
     def signalNamespace(self, name):
     	for attribute in dir(self):

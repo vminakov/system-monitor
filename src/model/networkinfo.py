@@ -2,25 +2,27 @@
 import psutil
 
 from PySide import QtCore
-from wsw.model import QAbstractItemModel
+from wsw.model import QAbstractItemModel, QTimer
+from wsw.model import Signal
 from model.util import humanize_bytes
 
 class NetworkInfo(QAbstractItemModel):
 
-    bytesSentChanged = QtCore.Signal(str)
-    bytesReceivedChanged = QtCore.Signal(str)
-    packetsSentChanged = QtCore.Signal(str)
-    packetsReceivedChanged = QtCore.Signal(str)
+    bytesSentChanged = Signal(str)
+    bytesReceivedChanged = Signal(str)
+    packetsSentChanged = Signal(str)
+    packetsReceivedChanged = Signal(str)
 
-    bytesSentSpeedChanged = QtCore.Signal(str)
-    bytesReceivedSpeedChanged = QtCore.Signal(str)
-    packetsSentSpeedChanged = QtCore.Signal(str)
-    packetsReceivedSpeedChanged = QtCore.Signal(str)
+    bytesSentSpeedChanged = Signal(str)
+    bytesReceivedSpeedChanged = Signal(str)
+    packetsSentSpeedChanged = Signal(str)
+    packetsReceivedSpeedChanged = Signal(str)
 
-    def __init__(self, iface, parent=None):
+    def __init__(self, iface, refreshRate = 1, parent=None):
         super(NetworkInfo, self).__init__(parent)
 
         self._iface = iface
+        self._refreshRate = refreshRate
 
         self._bytesSent = None
         self._bytesReceived = None
@@ -34,9 +36,9 @@ class NetworkInfo(QAbstractItemModel):
 
         self._firstRun = True
 
-        timer = QtCore.QTimer(self)
-        timer.timeout.connect(self._refresh)
-        timer.start(1000)
+        self.timer = QTimer(self)
+        self.timer.timeout.connect(self._refresh)
+        self.timer.start(self._refreshRate * 1000)
 
     def _refresh(self):
         if self._iface != 'total':
@@ -70,12 +72,12 @@ class NetworkInfo(QAbstractItemModel):
 
         else:
             # calculate data transmision speeds per minute
-            speed = humanize_bytes(netinfo.bytes_sent - self._bytesSent, 2) + '/s'
+            speed = humanize_bytes((netinfo.bytes_sent - self._bytesSent) / self._refreshRate, 2) + '/s'
             if speed != self._bytesSentSpeed:
                 self._bytesSentSpeed = speed
                 self.bytesSentSpeedChanged.emit(self._bytesSentSpeed)
 
-            speed = humanize_bytes(netinfo.bytes_recv - self._bytesReceived, 2) + '/s'
+            speed = humanize_bytes((netinfo.bytes_recv - self._bytesReceived) / self._refreshRate, 2) + '/s'
             if speed != self._bytesReceivedSpeed:
                 self._bytesReceivedSpeed = speed
                 self.bytesReceivedSpeedChanged.emit(self._bytesReceivedSpeed)
@@ -94,10 +96,12 @@ class NetworkInfo(QAbstractItemModel):
             # calculate total data transfered
             if (netinfo.bytes_sent != self._bytesSent):
                 self._bytesSent = netinfo.bytes_sent
+                #print(self._iface + ': Bytes sent: ' + str(self._bytesSent))
                 self.bytesSentChanged.emit(humanize_bytes(self._bytesSent, 2))
 
             if (netinfo.bytes_recv != self._bytesReceived):
                 self._bytesReceived = netinfo.bytes_recv
+                #print(self._iface + ': Bytes received' + str(self._bytesReceived))
                 self.bytesReceivedChanged.emit(humanize_bytes(self._bytesReceived, 2))
 
             if (netinfo.packets_sent != self._packetsSent):

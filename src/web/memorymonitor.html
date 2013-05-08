@@ -22,7 +22,7 @@
                <li><a href='processes.html'>Processes</a></li>
                <li class="active"><a href="#">Memory monitor</a></li>
                <li><a href='cpumonitor.html'>CPU monitor</a></li>
-               <li><a href='newtorkmonitor.html'>Network monitor</a></li>
+               <li><a href='networkmonitor.html'>Network monitor</a></li>
              </ul>
            </div>
          </div>
@@ -94,6 +94,8 @@
                   tickPixelInterval: 150
                },
                yAxis: {
+                  min: 0,
+                  max: 100,
                   title: {
                      text: 'Memory usage (%)'
                   }
@@ -119,6 +121,8 @@
                   tickPixelInterval: 150
                },
                yAxis: {
+                  min: 0,
+                  max: 100,
                   title: {
                      text: 'Memory usage (%)'
                   }
@@ -134,9 +138,9 @@
 
             var wsuri;
             if (window.location.protocol === "file:") {
-               wsuri = "ws://localhost:9000";
+               wsuri = "ws://localhost:9002";
             } else {
-               wsuri = "ws://" + window.location.hostname + ":9000";
+               wsuri = "ws://" + window.location.hostname + ":9002";
             }
 
             // connect to WAMP server
