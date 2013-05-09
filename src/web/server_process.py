@@ -49,12 +49,25 @@ class ProcessMonitorServerProtocol(WampServerProtocol):
       # when connection is established, we create our
       # model instances and register them for RPC. that's it.
 
-      # first of all, create and setup chart models
+      # set up process model
+      self.processModel = Process()
+      self.processModel.signalNamespace("processModel")
+      self.registerMethodForRpc(self.uri + '/processModel.rowCount', self.processModel,
+         lambda i: self.processModel.rowCount())
+      self.registerMethodForRpc(self.uri + '/processModel.columnCount', self.processModel,
+         lambda i: self.processModel.columnCount())
+      self.registerMethodForRpc(self.uri + '/processModel.headerData', self.processModel, 
+         lambda section: self.processModel.headerData(section))
+      self.registerMethodForRpc(self.uri + '/processModel.allData', self.processModel, 
+         lambda i: self.processModel.allData())
       
 
 
    def connectionLost(self, reason):
       WampServerProtocol.connectionLost(self, reason)
+
+      self.processModel.timer.stop()
+      self.processModel = None
 
 
 

@@ -37,7 +37,16 @@ class AbstractItemModel(object):
     			getattr(self, attribute).init(name)
 
 class AbstractTableModel(AbstractItemModel):
-	
-	def index(self, x, y):
-		# create anonymous class
-		return type("ModelIndex", tuple([object]), {'column': lambda self: x, 'row': lambda self: y})
+    class ModelIndex(object):    
+        def __init__(self, x, y):
+            self.x = x
+            self.y = y
+        
+        def column(self):
+            return self.y
+
+        def row(self):
+            return self.x
+
+    def index(self, x, y):
+        return AbstractTableModel.ModelIndex(x, y)
