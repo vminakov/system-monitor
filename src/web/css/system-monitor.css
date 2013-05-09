@@ -28,3 +28,10 @@ table.netinfo tr td.data {
     padding-left: 40px;
     padding-right: 40px;
 }
+
+/**
+ * Process list table
+ */
+table.process {
+	width: 100%;
+}

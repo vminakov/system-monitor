@@ -54,16 +54,33 @@
 
                   console.log("Connected to " + wsuri);
 
-                  var table = $('<table />');
+                  var table = $('<table />')
+                                 .addClass('process')
+                                 .addClass('table')
+                                 .addClass('table-striped')
+                                 .addClass('table-condensed')
+                                 .appendTo('div.row');
 
                   sess.call(endpoint + 'processModel.columnCount').then(function(columnCount) {
+                     
+                     // build table header - ask server for header details
                      var headerTr = $('<tr />');
                      for (var i = 0; i < columnCount; i++) {
-                        sess.call(endpoint + 'processModel.headerData', [i]).then(function(headerName) {
+                        sess.call(endpoint + 'processModel.headerData', i).then(function(headerName) {
                            $('<th />').text(headerName).appendTo(headerTr);
                         });
                      }
                      headerTr.appendTo(table);
+                     var tbody = $('<tbody />').appendTo(table);
+
+                     // after the header, build the table first
+                     buildProcessTable(sess, endpoint, tbody);
+
+                     // and the update it on every change
+                     sess.subscribe(endpoint + 'processModel.dataChanged', function() {
+                        tbody.empty();
+                        buildProcessTable(sess, endpoint, tbody);
+                     });
                   });              
                   
                },
@@ -81,6 +98,18 @@
                }
             );
          });
+
+         function buildProcessTable(sess, endpoint, tableEl) {
+            sess.call(endpoint + 'processModel.allData').then(function(processData) {
+               $.each(processData, function(index, values) {
+                  var row = $('<tr />');
+                  $.each(values, function(i, processData) {
+                     $('<td />').text(processData).appendTo(row);
+                  });
+                  row.appendTo(tableEl);
+               });
+            });
+         }
       </script>
    </body>
  </html>

@@ -6,10 +6,23 @@
 #		A simple script to stop WebScoket server instances
 
 
-import subprocess, os, signal
+import subprocess, os, signal, sys
 
 grepRegex = 'server_info\.py\|server_process\.py\|server_memory\.py\|server_cpu\.py\|server_network\.py'
-grepLines = subprocess.check_output('ps aux | grep "%s"' % (grepRegex), shell=True).split('\n')
+#output = subprocess.call('ps aux | grep "%s"' % (grepRegex), shell=True)
+
+p1 = subprocess.Popen(["ps", "aux"], stdout=subprocess.PIPE)
+p2 = subprocess.Popen(["grep", grepRegex], stdin=p1.stdout, stdout=subprocess.PIPE)
+p1.stdout.close()  # Allow p1 to receive a SIGPIPE if p2 exits.
+output = p2.communicate()[0]
+
+print output
+
+if len(output) == 0:
+	print("No running server intances found. Exiting.")
+	sys.exit()
+
+grepLines = output.split('\n')
 
 pids = []
 for line in grepLines:

@@ -2,7 +2,7 @@
 import psutil
 
 from PySide import QtCore
-from wsw.model import QAbstractTableModel
+from wsw.model import QAbstractTableModel, QTimer
 from model.util import humanize_bytes
 
 class Process(QAbstractTableModel):
@@ -11,7 +11,7 @@ class Process(QAbstractTableModel):
 
         self._refresh()
 
-        self.timer = QtCore.QTimer(self)
+        self.timer = QTimer(self)
         self.timer.timeout.connect(self._refresh)
         self.timer.start(3000)
 
@@ -51,7 +51,7 @@ class Process(QAbstractTableModel):
 
         return self._data[row][column]
 
-    def headerData(self, section, orientation, role=QtCore.Qt.DisplayRole):
+    def headerData(self, section, orientation = None, role=QtCore.Qt.DisplayRole):
         if role != QtCore.Qt.DisplayRole:
             return None
 
@@ -71,6 +71,8 @@ class Process(QAbstractTableModel):
             return 'Memory usage'
         elif section == 7:
             return 'CPU usage'
+
+        print section
 
     def allData(self):
         return self._data

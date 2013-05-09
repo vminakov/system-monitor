@@ -1,5 +1,5 @@
 
-import traceback
+import traceback, json
 
 class Signal(object):
 
@@ -56,8 +56,16 @@ class Signal(object):
 
     def emit(self, *data):
         if self._isIntialized:
-            print(self.uri)
-            Signal.wampProtocol.dispatch(self.uri, data)
+            #print(self.uri)
+            serializableData = list()
+            for dataItem in data:
+                try:
+                    json.dumps(dataItem)
+                    serializableData.append(data)
+                except:
+                    serializableData.append(None)
+
+            Signal.wampProtocol.dispatch(self.uri, serializableData)
 
 
 class Slot(object):

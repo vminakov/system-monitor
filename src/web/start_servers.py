@@ -3,7 +3,7 @@
 #
 #       start_servers.py
 #       
-#		A primitive script to start WebSocket servers
+#		A primitive script to start WebSocket servers.
 
 import subprocess
 
