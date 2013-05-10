@@ -28,8 +28,8 @@
 
                   console.log("Connected to " + wsuri);
 
-                  sess.subscribe("http://example.com/simple/memoryChart.dataChanged", onEvent);
-                  sess.call('http://example.com/simple/data').then(ab.log);
+                  sess.subscribe("http://system-monitor.com/memoryChart.dataChanged", onEvent);
+                  sess.call('http://system-monitor.com/data').then(ab.log);
                   //test();
                },
 

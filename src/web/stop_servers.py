@@ -16,7 +16,6 @@ p2 = subprocess.Popen(["grep", grepRegex], stdin=p1.stdout, stdout=subprocess.PI
 p1.stdout.close()  # Allow p1 to receive a SIGPIPE if p2 exits.
 output = p2.communicate()[0]
 
-print output
 
 if len(output) == 0:
 	print("No running server intances found. Exiting.")

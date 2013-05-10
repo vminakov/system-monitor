@@ -1,27 +1,16 @@
-###############################################################################
-##
-##  Copyright 2011,2012 Tavendo GmbH
-##
-##  Licensed under the Apache License, Version 2.0 (the "License");
-##  you may not use this file except in compliance with the License.
-##  You may obtain a copy of the License at
-##
-##      http://www.apache.org/licenses/LICENSE-2.0
-##
-##  Unless required by applicable law or agreed to in writing, software
-##  distributed under the License is distributed on an "AS IS" BASIS,
-##  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-##  See the License for the specific language governing permissions and
-##  limitations under the License.
-##
-###############################################################################
+# -*- coding: utf-8 -*-
+#
+#     server_network.py
+#       
+#     WebSocket server responsible for handling network monitoring
+#     data
 
 import sys, os, psutil
 
 sys.path.insert(1, os.path.join(sys.path[0], '..'))
 
 from twisted.python import log
-from twisted.internet import reactor, defer
+from twisted.internet import reactor
 from twisted.web.server import Site
 from twisted.web.static import File
 
@@ -36,19 +25,24 @@ from model.networkinfo import NetworkInfo
 
 class NetworkInfoServerProtocol(WampServerProtocol):
    """
-   Demonstrates creating a simple server with Autobahn WebSockets that
-   responds to RPC calls.
+   This is simple netowrk monitor server protocol.
+
+   As with other server classes, model is created, when new connection
+   is established, and deleted when client closes websocket connection
    """
 
-   uri = "http://example.com/simple"
+   uri = "http://system-monitor.com"
 
    def onSessionOpen(self):
+      """
+      When connection is established, we create our
+      model instances and register them for RPC if needed.
+      """
 
+      # all websocket signals and slots must use
+      # current protocol as the communication channel
       Signal.wampProtocol = self
       Slot.wampProtocol = self
-
-      # when connection is established, we create our
-      # model instances and register them for RPC. that's it.
 
       # create and setup network info model
       self.netInfoModels = []
@@ -59,12 +53,16 @@ class NetworkInfoServerProtocol(WampServerProtocol):
          modelName = 'netInfoModel' + iface
          netInfoModel.signalNamespace(modelName)
          self.netInfoModels.append(netInfoModel)
-         #self.registerMethodForRpc(self.uri + '/' + modeName + '.')
 
       self.registerForRpc(self, self.uri + '/network#')
 
 
    def connectionLost(self, reason):
+      """
+      When connection is gone (i.e. client close window, navigated
+      away from the page), stop the model timer, which holds last
+      reference to model, and delete the model
+      """
       WampServerProtocol.connectionLost(self, reason)
 
       for model in self.netInfoModels:
@@ -74,12 +72,13 @@ class NetworkInfoServerProtocol(WampServerProtocol):
 
    @exportRpc
    def getIfaces(self):
+      """
+      Return names of all available network interfaces
+      """
       ifaces = psutil.network_io_counters(pernic=True).keys()
       ifaces.append('total')
 
       return ifaces
-
-      #return ['eth1', 'total']
 
 
 if __name__ == '__main__':

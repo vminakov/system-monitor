@@ -29,6 +29,7 @@ from app.processmonitor import ProcessMonitor
 from app.memorymonitor import MemoryMonitor
 from app.cpumonitor import CpuMonitor
 from app.networkmonitor import NetworkMonitor
+from app.logbrowser import LogBrowser
 
 class MainWindow(QtGui.QMainWindow):
 
@@ -50,12 +51,14 @@ class MainWindow(QtGui.QMainWindow):
 		self._memoryMonitorWidget = MemoryMonitor()
 		self._cpuMonitorWidget = CpuMonitor()
 		self._networkMonitorWidget = NetworkMonitor()
+		self._logBrowserWidget = LogBrowser()
 
 		self.ui.tabWidget.addTab(self._systemWindowWidget, "System")
 		self.ui.tabWidget.addTab(self._processMonitorWidget, "Processes")
 		self.ui.tabWidget.addTab(self._memoryMonitorWidget, "Memory")
 		self.ui.tabWidget.addTab(self._cpuMonitorWidget, "CPU(s)")
 		self.ui.tabWidget.addTab(self._networkMonitorWidget, "Network")
+		self.ui.tabWidget.addTab(self._logBrowserWidget, "Log browser")
 
 	def about(self):
 		QtGui.QMessageBox.about(self, "About System Monitor", 

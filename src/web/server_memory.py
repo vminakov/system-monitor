@@ -1,33 +1,21 @@
-###############################################################################
-##
-##  Copyright 2011,2012 Tavendo GmbH
-##
-##  Licensed under the Apache License, Version 2.0 (the "License");
-##  you may not use this file except in compliance with the License.
-##  You may obtain a copy of the License at
-##
-##      http://www.apache.org/licenses/LICENSE-2.0
-##
-##  Unless required by applicable law or agreed to in writing, software
-##  distributed under the License is distributed on an "AS IS" BASIS,
-##  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-##  See the License for the specific language governing permissions and
-##  limitations under the License.
-##
-###############################################################################
+# -*- coding: utf-8 -*-
+#
+#     server_memory.py
+#       
+#     WebSocket server responsible for handling memory monitoring
+#     data
 
 import sys, os
 
 sys.path.insert(1, os.path.join(sys.path[0], '..'))
 
 from twisted.python import log
-from twisted.internet import reactor, defer
+from twisted.internet import reactor
 from twisted.web.server import Site
 from twisted.web.static import File
 
 from autobahn.websocket import listenWS
-from autobahn.wamp import exportRpc, \
-                          WampServerFactory, \
+from autobahn.wamp import WampServerFactory, \
                           WampServerProtocol
 
 from wsw.wsmodel.event import Signal, Slot
@@ -37,19 +25,25 @@ from model.memoryinfo import MemoryInfo
 
 class MemoryMonitorServerProtocol(WampServerProtocol):
    """
-   Demonstrates creating a simple server with Autobahn WebSockets that
-   responds to RPC calls.
+   This is simple memory monitor server protocol.
+
+   As with other server classes model is created, when new connection
+   is established, and deleted when client closes websocket connection
    """
 
-   uri = "http://example.com/simple"
+   uri = "http://system-monitor.com"
 
    def onSessionOpen(self):
+      """
+      When connection is established, we create our
+      model instances and register them for RPC. that's it.
+      """
 
+      # all websocket signals and slots must use
+      # current protocol as the communication channel
       Signal.wampProtocol = self
       Slot.wampProtocol = self
 
-      # when connection is established, we create our
-      # model instances and register them for RPC. that's it.
 
       # first of all, create and setup chart models
       self.memoryChartVirt = MemoryChart("virt")
@@ -71,6 +65,12 @@ class MemoryMonitorServerProtocol(WampServerProtocol):
 
 
    def connectionLost(self, reason):
+      """
+      When connection is gone (i.e. client close window, navigated
+      away from the page), stop the model timer, which holds last
+      reference to model, and delete the model
+      """
+      
       WampServerProtocol.connectionLost(self, reason)
 
       self.memoryChartVirt.timer.stop()

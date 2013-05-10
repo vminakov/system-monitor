@@ -26,7 +26,7 @@ class ProcessMonitorServerProtocol(WampServerProtocol):
    is established, and deleted when client closes websocket connection
    """
 
-   uri = "http://example.com/simple"
+   uri = "http://system-monitor.com"
 
    def onSessionOpen(self):
       """
@@ -65,8 +65,6 @@ class ProcessMonitorServerProtocol(WampServerProtocol):
 
       self.processModel.timer.stop()
       self.processModel = None
-
-
 
 
 if __name__ == '__main__':
