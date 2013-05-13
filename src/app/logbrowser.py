@@ -1,6 +1,6 @@
 from PySide import QtGui
 from ui.ui_logbrowser import Ui_LogBrowser
-#from model.process import Process
+from model.loginfo import LogInfo
 
 class LogBrowser(QtGui.QWidget):
 
@@ -10,7 +10,23 @@ class LogBrowser(QtGui.QWidget):
         self.ui = Ui_LogBrowser()
         self.ui.setupUi(self)
 
-        # self.model = Process()
+        self.ui.comboBox.currentIndexChanged.connect(self.logChanged)
 
-        # self.ui.tableView.setModel(self.model)
-        
+        self.model = LogInfo()
+        self.model.setLogFile('/var/log/syslog')
+        self.ui.textBrowser.append(''.join(self.model.readLastLines()))
+        self.model.lineAdded.connect(self.addLogEntry)
+
+    def addLogEntry(self, line):
+    	self.ui.textBrowser.append(line)
+
+    def logChanged(self, index):
+    	paths = [
+    		'/var/log/syslog',
+    		'/var/log/messages',
+    		'/var/log/kern.log',
+    		'/var/log/auth.log']
+    	path = paths[index]
+
+    	self.model.setLogFile(path)
+    	self.ui.textBrowser.setPlainText(''.join(self.model.readLastLines()))

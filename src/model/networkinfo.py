@@ -1,7 +1,6 @@
 
 import psutil
 
-from PySide import QtCore
 from wsw.model import QAbstractItemModel, QTimer
 from wsw.model import Signal
 from model.util import humanize_bytes
@@ -111,12 +110,3 @@ class NetworkInfo(QAbstractItemModel):
             if (netinfo.packets_recv != self._packetsReceived):
                 self._packetsReceived = netinfo.packets_recv
                 self.packetsReceivedChanged.emit(str(self._packetsReceived))
-
-
-
-            
-
-
-    def _refreshTotal(self):
-        pass
-

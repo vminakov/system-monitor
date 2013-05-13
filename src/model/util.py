@@ -1,7 +1,8 @@
 
 
 def humanize_bytes(bytes, precision=1):
-    """Return a humanized string representation of a number of bytes.
+    """
+    Return a humanized string representation of a number of bytes.
     """
     abbrevs = (
         (1<<50L, 'PB'),

@@ -8,7 +8,7 @@
 
 import subprocess, os, signal, sys
 
-grepRegex = 'server_info\.py\|server_process\.py\|server_memory\.py\|server_cpu\.py\|server_network\.py'
+grepRegex = 'server_info\.py\|server_process\.py\|server_memory\.py\|server_cpu\.py\|server_network\.py\|server_log\.py'
 #output = subprocess.call('ps aux | grep "%s"' % (grepRegex), shell=True)
 
 p1 = subprocess.Popen(["ps", "aux"], stdout=subprocess.PIPE)

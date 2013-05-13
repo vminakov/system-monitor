@@ -1,27 +1,55 @@
+# -*- coding: utf-8 -*-
+#
+#       chart.py
+#       
+#       Custom interactive chart widget
 
 from PySide import QtGui, QtCore
 
 class Chart(QtGui.QWidget):
+    """
+    Draws a chart from series of points supplied by model
+
+    The class draws axis, axis labels and line chart inside QWidget
+    """
+
     def __init__(self, parent=None):
         super(Chart, self).__init__(parent)
 
+        # some random points won't be actually sued
         self.points = [20, 30, 15, 3, 10, 20, 4, 10, 90]
 
         self.model = None
 
     def setModel(self, model):
+        """
+        Set the model classes for chart
+
+        dataChanged signal of model is used to notify
+        when new data is available
+        """
+
         self.model = model
         self.model.dataChanged.connect(self.fetchData)
 
     def getModel(self):
+        """
+        Return registered model instance
+        """
         return self.model
 
     def fetchData(self, topLeft, bottomRight):
+        """
+        Fetches point data from model and starts chart redrawing
+        """
         self.points = self.model.data(None)
         self.repaint()
         self.update()
 
     def paintEvent(self, e):
+        """
+        Overrides default painting procedure for QWidget
+        """
         qp = QtGui.QPainter()
         qp.begin(self)
         self.drawBackground(qp)
@@ -30,6 +58,9 @@ class Chart(QtGui.QWidget):
         qp.end()
 
     def drawBackground(self, qp):
+        """
+        Draws white background and margins
+        """
         start_width = 40;
         start_height = 10;
 
@@ -39,6 +70,9 @@ class Chart(QtGui.QWidget):
         qp.fillRect(start_width, start_height, end_width, end_height, QtGui.QColor("white"))
 
     def drawAxis(self, qp):
+        """
+        Draw horizontal and vertical axes and labels
+        """
         draw_area_height = self.height() - 40;
         draw_area_width = self.width() - 40;
 
@@ -84,6 +118,9 @@ class Chart(QtGui.QWidget):
 
 
     def drawChart(self, qp):
+        """
+        Draw the actual line chart
+        """
         draw_area_height = self.height() - 30
 
         x_gap = (self.width() - 40) / len(self.points)

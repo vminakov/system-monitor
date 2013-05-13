@@ -1,7 +1,8 @@
 
 import copy
 
-from twisted.internet import task
+from twisted.internet import task, inotify
+from twisted.python import filepath
 from wsw.wsmodel.event import Signal
 
 class Timer(object):
@@ -50,3 +51,40 @@ class AbstractTableModel(AbstractItemModel):
 
     def index(self, x, y):
         return AbstractTableModel.ModelIndex(x, y)
+
+
+
+class FileSystemWatcher(AbstractItemModel):
+    
+    directoryChanged = Signal(str)
+    fileChanged = Signal(str)
+
+    def __init__(self, parent=None):
+        super(FileSystemWatcher, self).__init__(parent)
+
+        self._paths = []
+        self._notifier = inotify.INotify()
+        self._notifier.startReading()
+
+    def addPath(self, path):
+        self._paths.append(path)
+        self._notifier.watch(filepath.FilePath(path),
+                             callbacks=[self.onChange])
+
+    def onChange(self, watch, path, mask):
+        self.fileChanged.emit(path)
+
+    def addPaths(self, paths):
+        pass
+
+    def directories(self):
+        return list()
+
+    def files(self):
+        return self._paths
+
+    def removePath(self, path):
+        pass
+
+    def removePaths(self, paths):
+        pass

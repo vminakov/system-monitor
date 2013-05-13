@@ -28,38 +28,6 @@ class MemoryInfo(QAbstractItemModel):
         self.timer.timeout.connect(self._refresh)
         self.timer.start(1000)
 
-        #self._refresh()
-
-    # def _refresh(self):
-    #     if self._firstRun:
-    #         self._initialData()
-    #         self._firstRun = False
-    #     else:
-    #         self._refreshChanges()
-
-    # def _initialData(self):
-    #     if self._type == 'virt':
-    #         memUsage = psutil.virtual_memory()
-    #     else:
-    #         memUsage = psutil.swap_memory()
-
-    #     self._total = humanize_bytes(memUsage.total, 2)
-    #     self.totalChanged.emit(self._total)
-
-    #     if self._type == 'virt':
-    #         self._available = humanize_bytes(memUsage.available, 2)
-    #         self.availableChanged.emit(self._available)
-
-    #     self._percent = str(memUsage.percent) + '%'
-    #     self.percentChanged.emit(self._percent)
-
-    #     self._used = humanize_bytes(memUsage.used, 2)
-    #     self.usedChanged.emit(self._used)
-
-    #     self._free = humanize_bytes(memUsage.free, 2)
-    #     self.freeChanged.emit(self._free)
-
-
     def _refresh(self):
         if self._type == 'virt':
             memUsage = psutil.virtual_memory()

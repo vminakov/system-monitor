@@ -7,6 +7,7 @@ try:
         
         from PySide.QtCore import QAbstractItemModel as BaseAbstractItemModel
         from PySide.QtCore import QAbstractTableModel as BaseAbstractTableModel
+        from PySide.QtCore import QFileSystemWatcher as BaseFileSystemWatcher
         from PySide.QtCore import QTimer as BaseTimer
         from PySide.QtCore import Signal as BaseSignal
         from PySide.QtCore import Slot as BaseSlot
@@ -14,15 +15,18 @@ except (NameError, AttributeError):
     print ("importing from WSW")
     from wsw.wsmodel.model import AbstractItemModel as BaseAbstractItemModel
     from wsw.wsmodel.model import AbstractTableModel as BaseAbstractTableModel
+    from wsw.wsmodel.model import FileSystemWatcher as BaseFileSystemWatcher
     from wsw.wsmodel.model import Timer as BaseTimer
     from wsw.wsmodel.event import Signal as BaseSignal
     from wsw.wsmodel.event import Slot as BaseSlot
-    #from wsw.wsmodel.model import AbstractTableModel as BaseAbstractTableModel
 
 class QAbstractItemModel(BaseAbstractItemModel):
     pass
 
 class QAbstractTableModel(BaseAbstractTableModel):
+    pass
+
+class QFileSystemWatcher(BaseFileSystemWatcher):
     pass
 
 class QTimer(BaseTimer):
@@ -36,6 +40,3 @@ class Slot(object):
 
 Signal = BaseSignal
 Slot = BaseSlot
-
-#class QAbstractTableModel(BaseAbstractTableModel):
-#    pass

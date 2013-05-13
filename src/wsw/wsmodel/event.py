@@ -14,6 +14,8 @@ class Signal(object):
         during class declaration, when wampProtocol is unknown.
 
         """
+
+        self._callback = None
         self._isIntialized = False
         signalName = kwargs.pop('signalName', None)
 
@@ -55,8 +57,10 @@ class Signal(object):
 
 
     def emit(self, *data):
+        if self._callback is not None:
+            self._callback(*data)
+
         if self._isIntialized:
-            #print(self.uri)
             serializableData = list()
             for dataItem in data:
                 try:
@@ -66,6 +70,13 @@ class Signal(object):
                     serializableData.append(None)
 
             Signal.wampProtocol.dispatch(self.uri, serializableData)
+            
+            if self._callback is not None:
+                self._callback(*data)
+
+
+    def connect(self, callback):
+        self._callback = callback
 
 
 class Slot(object):

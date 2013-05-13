@@ -18,44 +18,44 @@
          <div class="navbar">
            <div class="navbar-inner">
              <ul class="nav">
-               <li class="active"><a href="systeminfo.html">System info</a></li>
+               <li><a href="systeminfo.html">System info</a></li>
                <li><a href='processes.html'>Processes</a></li>
                <li><a href="memorymonitor.html">Memory monitor</a></li>
                <li><a href='cpumonitor.html'>CPU monitor</a></li>
                <li><a href='networkmonitor.html'>Network monitor</a></li>
-               <li><a href='logbrowser.html'>Log browser</a></li>
+               <li class="active"><a href='logbrowser.html'>Log browser</a></li>
              </ul>
            </div>
          </div>
          
          <div class="row">
-            <div class="span3">
-               <img src="img/system-monitor.png" alt="System Monitor" />
-            </div>
             <div class="span9">
-               <h4>System information:</h4>
-               <div id="sysinfo-container"></div>
-
-               <h4>Hardware information:</h4>
-               <div id="hardware-container"></div>
+               Select log file to view:
+               <select>
+                  <option value="0">Syslog - /var/log/syslog</option>
+                  <option value="1">Messages - /var/log/messages</option>
+                  <option value="2">Kernel - /var/log/kern.log</option>
+                  <option value="3">Auth - /var/log/auth.log</option>
+               </select>
+            </div>
+            <div class="span11">
+               <textarea>
+               </textarea>
             </div>
          </div>
-            
       </div>
 
       <script>
          jQuery(function() {
-            
-         
-            
+
             var sess = null;
             var endpoint = 'http://system-monitor.com/';
 
             var wsuri;
             if (window.location.protocol === "file:") {
-               wsuri = "ws://localhost:9000";
+               wsuri = "ws://localhost:9005";
             } else {
-               wsuri = "ws://" + window.location.hostname + ":9000";
+               wsuri = "ws://" + window.location.hostname + ":9005";
             }
 
             // connect to WAMP server
@@ -68,25 +68,18 @@
 
                   console.log("Connected to " + wsuri);
 
-                  // get OS information
-                  sess.call(endpoint + 'sysInfo.getDistro').then(function(distro) {
-                     $('<div />').text(distro).appendTo($('#sysinfo-container'));
-                  });
-                  sess.call(endpoint + 'sysInfo.getKernel').then(function(kernel) {
-                     $('<div />').text(kernel).appendTo($('#sysinfo-container'));
+                  // fetch last 10 lines of /var/log/syslog by default
+                  sess.call(endpoint + 'logModel.readLastLines').then(function(lines) {
+                     $('textarea').text(lines.join(''));
                   });
 
-                  // get hardware info
-                  sess.call(endpoint + 'sysInfo.getTotalMemory').then(function(memory) {
-                     $('<div />').text("Memory: " + memory).appendTo($('#hardware-container'));
-                  });
-                  sess.call(endpoint + 'sysInfo.getCpu').then(function(cpus) {
-                     for (var i = 0; i < cpus.length; i++) {
-                        $('<div />').text('Processor #' + i + ': ' + cpus[i]).appendTo('#hardware-container');
-                     }
-                     
+                  // when a new line is added to log file, append it to textarea
+                  sess.subscribe(endpoint + 'logModel.lineAdded', function(uri, line) {
+                     var logText = $('textarea').text() + line + '\n';
+                     $('textarea').text(logText);
                   });
 
+                  
                },
 
                // WAMP session is gone
@@ -101,8 +94,18 @@
                   }
                }
             );
-         });
 
+            
+            $('select').change(function() {
+               var logNumber = $(this).find(':selected').val();
+
+               sess.call(endpoint + 'logModel.changeLogFile', logNumber).then(function() {
+                  sess.call(endpoint + 'logModel.readLastLines').then(function(lines) {
+                        $('textarea').text(lines.join(''));
+                  });
+               });
+            });
+         });
       </script>
    </body>
  </html>

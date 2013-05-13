@@ -17,7 +17,28 @@
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
-      <widget class="QComboBox" name="comboBox"/>
+      <widget class="QComboBox" name="comboBox">
+       <item>
+        <property name="text">
+         <string>Syslog - /var/log/syslog</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Messages - /var/log/messages</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Kernel - /var/log/kern.log</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Auth - /var/log/auth.log</string>
+        </property>
+       </item>
+      </widget>
      </item>
     </layout>
    </item>
