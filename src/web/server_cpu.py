@@ -39,18 +39,13 @@ class MemoryMonitorServerProtocol(WampServerProtocol):
       model instances and register them for RPC. that's it.
       """
 
-      # all websocket signals and slots must use
-      # current protocol as the communication channel
-      Signal.wampProtocol = self
-      Slot.wampProtocol = self
-
       # create and setup cpu models
       self.cpuModels = []
       numOfCpus = len(psutil.cpu_percent(interval=None, percpu=True))
       for i in range(numOfCpus):
          modelName = "cpuModel%s" % i
          cpuModel = CpuChart(i)
-         cpuModel.signalNamespace(modelName)
+         cpuModel.signalNamespace(self, modelName)
          self.registerMethodForRpc(self.uri + '/' + modelName + '.data', cpuModel, cpuModel.data)
          self.cpuModels.append(cpuModel)
 

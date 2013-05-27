@@ -40,27 +40,26 @@ class MemoryMonitorServerProtocol(WampServerProtocol):
       """
 
       # all websocket signals and slots must use
-      # current protocol as the communication channel
-      Signal.wampProtocol = self
-      Slot.wampProtocol = self
+      # current protocol as the communication channel,
+      # so pass 'self' to signalNamespace method of models
 
 
       # first of all, create and setup chart models
       self.memoryChartVirt = MemoryChart("virt")
-      self.memoryChartVirt.signalNamespace("memoryChartVirt")
+      self.memoryChartVirt.signalNamespace(self, "memoryChartVirt")
       self.registerMethodForRpc(self.uri + '/memoryChartVirt.data', self.memoryChartVirt, self.memoryChartVirt.data)
 
       self.memoryChartSwap = MemoryChart("swap")
-      self.memoryChartSwap.signalNamespace("memoryChartSwap")
+      self.memoryChartSwap.signalNamespace(self, "memoryChartSwap")
       self.registerMethodForRpc(self.uri + '/memoryChartSwap.data', self.memoryChartSwap, self.memoryChartSwap.data)
 
       # thereafter, setup memory info models
       self.memoryInfoVirt = MemoryInfo("virt")
-      self.memoryInfoVirt.signalNamespace("memoryInfoVirt")
+      self.memoryInfoVirt.signalNamespace(self, "memoryInfoVirt")
       self.registerMethodForRpc(self.uri + '/memoryInfoVirt.getCounters', self.memoryInfoVirt, lambda i: self.memoryInfoVirt.getCounters())
 
       self.memoryInfoSwap = MemoryInfo("swap")
-      self.memoryInfoSwap.signalNamespace("memoryInfoSwap")
+      self.memoryInfoSwap.signalNamespace(self, "memoryInfoSwap")
       self.registerMethodForRpc(self.uri + '/memoryInfoSwap.getCounters', self.memoryInfoSwap, lambda i: self.memoryInfoSwap.getCounters())
 
 
@@ -95,7 +94,7 @@ if __name__ == '__main__':
    else:
       debug = False
 
-   factory = WampServerFactory("ws://localhost:9002", debugWamp = debug)
+   factory = WampServerFactory("ws://192.168.1.66:9002", debugWamp = debug)
    factory.protocol = MemoryMonitorServerProtocol
    factory.setProtocolOptions(allowHixie76 = True)
    listenWS(factory)

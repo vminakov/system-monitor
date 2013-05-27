@@ -33,14 +33,9 @@ class LogMonitorServerProtocol(WampServerProtocol):
       model instances and register them for RPC. that's it.
       """
 
-      # all websocket signals and slots must use
-      # current protocol as the communication channel
-      Signal.wampProtocol = self
-      Slot.wampProtocol = self
-
       # set up process model
       self.logModel = LogInfo()
-      self.logModel.signalNamespace("logModel")
+      self.logModel.signalNamespace(self, "logModel")
       self.logModel.setLogFile('/var/log/syslog')
 
       # expose model methods for RPC

@@ -37,11 +37,6 @@ class SystemInfoServerProtocol(WampServerProtocol):
       model instances and register them for RPC if needed.
       """
 
-      # all websocket signals and slots must use
-      # current protocol as the communication channel
-      Signal.wampProtocol = self
-      Slot.wampProtocol = self
-
       # create system info model and register methods for RPC
       self.infoModel = SystemInfo()
       self.registerMethodForRpc(self.uri + '/sysInfo.getTotalMemory', self.infoModel, lambda i: self.infoModel.getTotalMemory())

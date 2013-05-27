@@ -3,8 +3,6 @@ import traceback, json
 
 class Signal(object):
 
-    wampProtocol = None
-
     def __init__(self, *valueTypes, **kwargs):
         """Creates new signal
 
@@ -32,19 +30,21 @@ class Signal(object):
         else:
             self.signalName = signalName
 
-    def init(self, instanceName, uri=None):
+    def init(self, wampProtocol, instanceName, uri=None):
         """Initialize signal.
 
         instanceName muts be passed. Other configuration properties can be
         set from wampProtocol instance
 
         """
-        if Signal.wampProtocol is None:
-            raise RuntimeError("Cannot create a WebSocket Signal - no WampProtocol is registered")
+        #if Signal.wampProtocol is None:
+        #    raise RuntimeError("Cannot create a WebSocket Signal - no WampProtocol is registered")
 
         # by default, base signal URI is obtained from WampProtocol instances
+        self.wampProtocol = wampProtocol
+
         if uri is None:
-            self.uri = Signal.wampProtocol.uri
+            self.uri = self.wampProtocol.uri
         else:
             self.uri = uri
 
@@ -54,6 +54,10 @@ class Signal(object):
         self.wampProtocol.registerForPubSub(self.uri)
 
         self._isIntialized = True
+
+
+    def setWampProtocol(self, wampProtocol):
+        self.wampProtocol = wampProtocol
 
 
     def emit(self, *data):
@@ -69,7 +73,7 @@ class Signal(object):
                 except:
                     serializableData.append(None)
 
-            Signal.wampProtocol.dispatch(self.uri, serializableData)
+            self.wampProtocol.dispatch(self.uri, serializableData, eligible=[self.wampProtocol])
             
             if self._callback is not None:
                 self._callback(*data)

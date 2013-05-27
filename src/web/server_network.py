@@ -39,11 +39,6 @@ class NetworkInfoServerProtocol(WampServerProtocol):
       model instances and register them for RPC if needed.
       """
 
-      # all websocket signals and slots must use
-      # current protocol as the communication channel
-      Signal.wampProtocol = self
-      Slot.wampProtocol = self
-
       # create and setup network info model
       self.netInfoModels = []
 
@@ -51,7 +46,7 @@ class NetworkInfoServerProtocol(WampServerProtocol):
       for iface in ifaces:
          netInfoModel = NetworkInfo(iface, 2)
          modelName = 'netInfoModel' + iface
-         netInfoModel.signalNamespace(modelName)
+         netInfoModel.signalNamespace(self, modelName)
          self.netInfoModels.append(netInfoModel)
 
       self.registerForRpc(self, self.uri + '/network#')

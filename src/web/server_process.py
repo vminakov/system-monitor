@@ -34,14 +34,9 @@ class ProcessMonitorServerProtocol(WampServerProtocol):
       model instances and register them for RPC. that's it.
       """
 
-      # all websocket signals and slots must use
-      # current protocol as the communication channel
-      Signal.wampProtocol = self
-      Slot.wampProtocol = self
-
       # set up process model
       self.processModel = Process()
-      self.processModel.signalNamespace("processModel")
+      self.processModel.signalNamespace(self, "processModel")
 
       # expose model methods for RPC
       self.registerMethodForRpc(self.uri + '/processModel.rowCount', self.processModel,

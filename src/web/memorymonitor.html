@@ -157,6 +157,7 @@
                   // listen for dataChanged signal emitted by chart model. once received, call data() method
                   // (through RPC) and pass new data to chart widget. do it for borth virtual and swap memory
                   // charts
+
                   sess.subscribe(endpoint + "memoryChartVirt.dataChanged", function() {
                      sess.call(endpoint + 'memoryChartVirt.data').then(function(points) {
                         newPoint = points.pop();

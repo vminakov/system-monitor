@@ -32,10 +32,10 @@ class AbstractItemModel(object):
             if type(attribute) == Signal:
                 setattr(self, attributeName, copy.deepcopy(attribute))
 
-    def signalNamespace(self, name):
+    def signalNamespace(self, protocol, name):
     	for attribute in dir(self):
     		if type(getattr(self, attribute)) == Signal:
-    			getattr(self, attribute).init(name)
+    			getattr(self, attribute).init(protocol, name)
 
 class AbstractTableModel(AbstractItemModel):
     class ModelIndex(object):    
